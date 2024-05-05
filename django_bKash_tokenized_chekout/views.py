@@ -492,9 +492,10 @@ def __execute_payment(response):
             return HttpResponseRedirect(f'{__base_url}/create_payment/')   #if initiated call create payment api
         else:
             __execute_payment_api_response = __query_payment_api_response
+
     debugging_print(__execute_payment_api_response, 'Execute payment API response=')
-    __price = None
     
+    __price = None
     
     return HttpResponseRedirect(__base_url+"/?execute_payment_api_data="+json.dumps(__execute_payment_api_response))
 
