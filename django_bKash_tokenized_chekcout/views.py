@@ -362,7 +362,7 @@ def create_payment(request):
         __tokenized_payment_body = {
             'mode':'0001',
             'payerReference':__tokenized_payer_ref,
-            'callbackURL':f'{__base_url}/django_bKash_tokenized_chekout/execute_payment', 
+            'callbackURL':f'{__base_url}/django_bKash_tokenized_checkout/execute_payment', 
             'agreementID':__agreement_ID,
             'amount':__price,
             'currency':'BDT',
@@ -404,7 +404,7 @@ def create_payment(request):
         __checkout_body = {
             'mode':'0011',
             'payerReference':'01619777283',
-            'callbackURL':f'{__base_url}/django_bKash_tokenized_chekout/execute_payment',
+            'callbackURL':f'{__base_url}/django_bKash_tokenized_checkout/execute_payment',
             'amount':__price,
             'currency':'BDT',
             'intent':'sale',
@@ -518,7 +518,7 @@ def create_agreement(request):
     
     __create_agreement_body = {
         "mode": "0000",
-        "callbackURL": f'{__base_url}/django_bKash_tokenized_chekout/execute_agreement',
+        "callbackURL": f'{__base_url}/django_bKash_tokenized_checkout/execute_agreement',
         "payerReference": "01619777283",
     }
 

@@ -1,5 +1,5 @@
 """
-ASGI config for django_bKash_tokenized_chekout project.
+ASGI config for django_bKash_tokenized_checkout project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

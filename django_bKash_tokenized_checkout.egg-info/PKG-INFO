@@ -25,9 +25,9 @@ License-File: LICENSE
 License-File: License.rst
 Requires-Dist: Django>=5.0.4
 
-==============================
+===============================
 django_bKash_tokenized_checkout
-==============================
+===============================
 
 django-polls is a Django app to conduct web-based polls. For each
 question, visitors can choose between a fixed number of answers.
