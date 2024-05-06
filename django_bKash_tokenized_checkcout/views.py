@@ -1,24 +1,13 @@
 import json
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect
 import requests
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timezone
 
-# __base_url = 'http://127.0.0.1:8000'
-
-# __app_key = '4f6o0cjiki2rfm34kfdadl1eqq'
-# __app_secret = '2is7hdktrekvrbljjh44ll3d9l1dtjo4pasmjvs5vl5qr3fug4b'
-
-# __username = 'sandboxTokenizedUser02'
-# __password = 'sandboxTokenizedUser02@12345'
-
 __start_time = None
-# __test_time = None
 __token_expiration = None
 __refresh_token_call_time = None
-
-
 
 __grant_token_url = None
 __refresh_token_url = None
@@ -174,7 +163,7 @@ def get_cancel_agreement_api():
     return __cancel_agreement_url
 
 
-def __time_precesion(time, token_time):
+def __time_calculation(time, token_time):
     __day = time.day
     __month = time.month
     __year = time.year
@@ -227,36 +216,16 @@ def __token():
 
     if __refresh_token_call_time == None or __token_expiration == None:
         __start_time = __time
-        __refresh_token_call_time =  __time_precesion(__time, __current_time_in_sec+3300) #3300
-        __token_expiration = __time_precesion(__time, __current_time_in_sec+3600) #3600
-
-    print("current_time =", __time)
-    print("start_time =", __start_time)
-    print("end_time =", __time)
-    print("time Y =", __time.year)
-    print()
-    print("time_comparison <=", __start_time < __time)
-    print("time_comparison >=", __start_time > __time)
-    print("time_comparison ===", __start_time == __time)
-
-    print("Hours =", __hours )
-    print("minutes =", __minutes)
-    print("seconds =", __seconds)
-    print("__token_expiration seconds =", __token_expiration)
-    print("current_total seconds =", __current_time_in_sec)
+        __refresh_token_call_time =  __time_calculation(__time, __current_time_in_sec+3300)
+        __token_expiration = __time_calculation(__time, __current_time_in_sec+3600)
 
     if __refresh_token == None or __current_time_in_sec > __token_expiration[3] or __day > __token_expiration[0] or __month > __token_expiration[1] or __year > __token_expiration[2]:
-        print("\n\n\ncalling grant")
-        print("refresh token =", __refresh_token)
         __refresh_token_call_time = None
         __token_expiration = None
         __grant_token()
     elif __refresh_token_call_time[3] < __current_time_in_sec < __token_expiration[3]:
-        print("\n\n\ncalling refresh")
         __refresh_token_call_time = None
         __generate_refresh_token()
-    else:
-        print("skipping")
     
 def debugging_print(dict, name):
     i = 0
@@ -272,12 +241,6 @@ def debugging_print(dict, name):
 
 def __grant_token():
     global __grant_token_url, __start_time, __token_expiration, __grant_token_url, __refresh_token_url,__id_token, __token_expires_in, __refresh_token, __timeout_sec, __app_key, __app_secret, __username, __password, __base_url
-
-    #Grant api for token
-    # grant_url = f'{__base_url}/tokenized/checkout/token/grant'
-
-    # __grant_token_url = "https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/grant"
-    print("grant_url =",__grant_token_url)
 
     __grant_head = {
         'Content-Type':'application/json',
@@ -300,8 +263,6 @@ def __grant_token():
     __token_expires_in = grant_api_response.get("expires_in")
     __refresh_token = grant_api_response.get("refresh_token")
 
-    # __token()
-
     debugging_print(grant_api_response, 'Grant api response =')
 
 def __generate_refresh_token():
@@ -321,9 +282,6 @@ def __generate_refresh_token():
         'refresh_token':__refresh_token
     }
 
-    #refresh_token_url = f'{__base_url}/tokenized/checkout/token/refresh'
-    # __refresh_token_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/token/refresh'
-
     try:
         refresh_token_api_response = (requests.post(__refresh_token_url, headers=__refresh_head, json=__refresh_body, timeout=__timeout_sec)).json()
     except requests.exceptions.Timeout:
@@ -333,8 +291,6 @@ def __generate_refresh_token():
     __id_token=refresh_token_api_response.get('id_token')
     __refresh_token=refresh_token_api_response.get('refresh_token')
     
-    # __token()
-
     debugging_print(refresh_token_api_response, 'Refresh api response =')
 
 @csrf_exempt
@@ -343,14 +299,10 @@ def create_payment(request):
     
     __token()
 
-    # remove the comments for line 163-164 and delete line 165 ****
     if __price == None:
-        __price = request.POST.get('amount_textfield')
-    # __price = 22
-    print('in create payment and agreement status =', __agreement_status)
+        __price = request.POST.get('total_amount')
+        
     if __agreement_status == "Completed":
-        #Create tokenized payment api
-        # __tokenized_create_payment_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create'
 
         __tokenized_payment_head = {
             'Content-Type':'application/json',
@@ -376,22 +328,18 @@ def create_payment(request):
         except requests.exceptions.Timeout:
             return HttpResponseRedirect(__base_url+"/?tokenized_create_payment_api_data="+json.dumps({'message':'tokenized_create_payment_timeout'}))
         
-        
         if ('statusCode' in __tokenized_payment_api_response and __tokenized_payment_api_response.get('statusCode') == '0000'):
-            print("tokenized create payment response", __tokenized_payment_api_response,'\n')
-            payment_id = __tokenized_payment_api_response.get('paymentID')
-            bkashurl = __tokenized_payment_api_response.get('bkashURL')
-            print('bkash url =', bkashurl)
-            print('redirecting to bkashurl')
-            return HttpResponseRedirect(bkashurl)
+            
+            __payment_id = __tokenized_payment_api_response.get('paymentID')
+            __bkashurl = __tokenized_payment_api_response.get('bkashURL')
+
+            return HttpResponseRedirect(__bkashurl)
         else:
             return HttpResponseRedirect(__base_url+"/?tokenized_create_payment_api_data="+json.dumps(__tokenized_payment_api_response))
 
 
 
     else:
-        #Create payment Api
-        # __non_tokenized_create_payment_url = f'{__base_url}/tokenized/checkout/create'
         __non_tokenized_create_payment_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create'
 
         __checkout_head = {
@@ -416,7 +364,7 @@ def create_payment(request):
              __non_tokenized_payment_api_response = (requests.post(__non_tokenized_create_payment_url, headers=__checkout_head,json=__checkout_body, timeout=__timeout_sec)).json()
         except requests.exceptions.Timeout:
             return HttpResponseRedirect(__base_url+"/?non_tokenized_create_payment_api_data="+json.dumps({'message':'non tokenized payment api timeout'}))
-        print("before debugging print")
+        
         debugging_print( __non_tokenized_payment_api_response, "create payment response =")
 
         if ('statusCode' in  __non_tokenized_payment_api_response and  __non_tokenized_payment_api_response.get('statusCode') == '0000'):
@@ -428,25 +376,11 @@ def create_payment(request):
 
 
 def __execute_payment(response):
-    print('inside result')
+    
     global __payment_id, __execute_payment_url, __query_payment_url, __id_token, __base_url, __timeout_sec, __app_key, __price, __token_approved, __agreement_ID, __agreement_status
 
     __token()
 
-    # __current_url = response.get_full_path()
-
-    #Handling the error case when payment is canceled with cancel button in bkash url rather then give a error
-    # if 'cancel' in __current_url:
-    #     print('agreement status', __agreement_status)
-    #     if __agreement_ID == None:
-    #         return HttpResponseRedirect(__base_url)
-    #     else:
-    #         if __token_approved:
-    #             return HttpResponseRedirect(__base_url+"/tokenized_homepage/")
-    #         else:
-    #             return HttpResponseRedirect(__base_url+"/cancel_agreement/")
-            
-    #Execute payment api
     __execute_payment_head = {
     'Accept':'application/json',
     'Authorization': __id_token,
@@ -457,17 +391,11 @@ def __execute_payment(response):
         'paymentID': __payment_id
     }
     
-    # execute_payment_url = f'{__base_url}/tokenized/checkout/execute'
-    # __execute_payment_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute'
-
     try: 
         __execute_payment_api_response = (requests.post(__execute_payment_url, headers=__execute_payment_head, json=__execute_payment_body, timeout=__timeout_sec)).json()
         
     except requests.exceptions.Timeout: 
-        #Query payment api
-        # query_payment_url = f"{__base_url}/tokenized/checkout/payment/status"
-        # __query_payment_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/payment/status'
-
+      
         __query_payment_head ={
             'Content-Type':	"application/json",
             'Accept':'application/json',
@@ -487,11 +415,12 @@ def __execute_payment(response):
         except requests.exceptions.Timeout:
             return HttpResponseRedirect(__base_url+"/?execute_payment_api_data="+json.dumps({'message':"query timeout"}))
         
-        # query_payment_api_response['status'] = 'initiated' or 'success'
         if __query_payment_api_response.get('status') == 'initiated':
             return HttpResponseRedirect(f'{__base_url}/create_payment/')   #if initiated call create payment api
-        else:
+        elif __query_payment_api_response.get('status') == 'success':
             __execute_payment_api_response = __query_payment_api_response
+        else:
+            return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps(__query_payment_api_response))
 
     debugging_print(__execute_payment_api_response, 'Execute payment API response=')
     
@@ -506,9 +435,6 @@ def create_agreement(request):
 
     __token()
 
-    # __create_agreement_url = f'{__base_url}/tokenized/checkout/create'
-    # __create_agreement_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/create'
-    
     __create_agreement_head={
         'Content-Type':'application/json',
         'Accept':'application/json',
@@ -526,37 +452,21 @@ def create_agreement(request):
         __create_agreement_api_response = (requests.post(__create_agreement_url, headers=__create_agreement_head, json=__create_agreement_body, timeout=__timeout_sec)).json()
         print('create_agreement_api_response', __create_agreement_api_response)
     except requests.exceptions.Timeout:
-        return HttpResponseRedirect(__base_url+"/?create_agreement_api_data"+json.dumps({'message':'create agreement api response timeout'}))
+        return HttpResponseRedirect(__base_url+"/?create_agreement_api_data="+json.dumps({'message':'create agreement api response timeout'}))
         
-    
     if(__create_agreement_api_response.get('statusCode') == '0000'):
         __agreement_status=__create_agreement_api_response.get('agreementStatus')
         __agreement_creation_request_id=__create_agreement_api_response.get('paymentID')
 
-        print("agreement status =", __agreement_status)
-        print("agreement_creation_request_id", __agreement_creation_request_id)
-        print("create agreement --> bkashurl")
         return HttpResponseRedirect(__create_agreement_api_response.get('bkashURL'))
     else:
-        return HttpResponseRedirect(__base_url+"/?create_agreement_api_data"+json.dumps(__create_agreement_api_response))
+        return HttpResponseRedirect(__base_url+"/?create_agreement_api_data="+json.dumps(__create_agreement_api_response))
 
 
 def __execute_agreement(response): 
     global __query_agreement_url, __execute_agreement_url, __id_token, __app_key, __timeout_sec, __agreement_creation_request_id, __agreement_ID, __agreement_status, __tokenized_payer_ref, __price
    
-    # need to check lines 474-480 
-    # __current_url = response.get_full_path()
-    # if 'cancel' in __current_url:
-    #     if __agreement_ID == None:
-    #         print('inside tokenized_result cancel')
-    #         return HttpResponseRedirect(__base_url)
-    #     else:
-    #         return HttpResponseRedirect(__base_url+"/tokenized_homepage/")
-    
     __token()
-
-    print('in tokenized result')
-    print('agreement creation request id =', __agreement_creation_request_id)
 
     #Execute agreement api
     __execute_agreement_head = {
@@ -569,16 +479,10 @@ def __execute_agreement(response):
         'paymentID': __agreement_creation_request_id
     }
 
-    # __execute_agreement_url=f'{__base_url}/tokenized/checkout/execute'
-    # __execute_agreement_url='https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/execute'
-
     try:
         __execute_agreement_api_response=(requests.post(__execute_agreement_url, headers=__execute_agreement_head, json=__execute_agreement_body, timeout=__timeout_sec)).json()
-    # execute_agreement_api_response = None
+    
     except requests.exceptions.Timeout:
-    # if execute_agreement_api_response == None:
-        # __query_agreement_url=f'{__base_url}/tokenized/checkout/agreement/status'  
-        # __query_agreement_url='https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/agreement/status'
 
         __query_agreement_head ={
             'Content-Type':	"application/json",
@@ -599,32 +503,26 @@ def __execute_agreement(response):
         
         debugging_print(__query_payment_api_response, 'Query response api =')
 
-        # query_payment_api_response['status'] = 'initiated' or 'success'
         if __query_payment_api_response.get('status') == 'initiated':
             return HttpResponseRedirect(f'{__base_url}/checkout/')   #if initiated call create payment api
-        elif len(__query_payment_api_response) == 2:
-            return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps(__execute_agreement_api_response))
-        else:
+        elif __query_payment_api_response.get('status') == 'success':
             __execute_agreement_api_response = __query_payment_api_response
-    
+        else:
+            return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps(__execute_agreement_api_response))
+        
     __agreement_ID=__execute_agreement_api_response.get('agreementID')
     __agreement_status=__execute_agreement_api_response.get('agreementStatus')
     __tokenized_payer_ref=__execute_agreement_api_response.get('payerReference')
 
     debugging_print(__execute_agreement_api_response, 'execute agreement api =')
     
-    # return HttpResponseRedirect(__base_url+"/?pgw=agreement&statusCode="+__execute_agreement_api_response.get("statusCode")+'&statusMessage='+__execute_agreement_api_response.get("statusMessage"))
     return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps(__execute_agreement_api_response))
-    # return JsonResponse(__execute_agreement_api_response)
-
+    
 def cancel_agreement(request):
     global __cancel_agreement_url, __agreement_ID, __agreement_status, __token_approved
 
     __token()
     
-    print('in cancel')
-
-    #Cancle Agreement payment api
     __cancel_agreement_head = {
     'Content-Type':"application/json",
     'Accept':'application/json',
@@ -636,22 +534,16 @@ def cancel_agreement(request):
         'agreementID': __agreement_ID
     }
 
-    # __cancel_agreement_url = f'{__base_url}/tokenized/checkout/agreement/cancel'
-    # __cancel_agreement_url = 'https://tokenized.sandbox.bka.sh/v1.2.0-beta/tokenized/checkout/agreement/cancel'
-    
-    print('calling cancel agreement api')
     try:
         __cancel_agreement_api_response = (requests.post(__cancel_agreement_url, headers=__cancel_agreement_head, json=__cancel_agreement_body, timeout=__timeout_sec)).json()
-        print('cancel agreement =', __cancel_agreement_api_response)
+        
     except requests.exceptions.Timeout:
         return HttpResponseRedirect(__base_url+"/?cancel_agreement_api_data="+json.dumps({'message':'cancel ageement api timeout'}))
     
     if (__cancel_agreement_api_response.get('statusCode') == '0000'):
-        print('cancel agreement success')
         __agreement_ID = None
         __agreement_status = None
         __token_approved = False
         return HttpResponseRedirect(__base_url+"/?cancel_agreement_api_data="+json.dumps(__cancel_agreement_api_response))
     else:
-        print('cancel_agreement error')
         return HttpResponseRedirect(__base_url+"/?cancel_agreement_api_data="+json.dumps(__cancel_agreement_api_response))
