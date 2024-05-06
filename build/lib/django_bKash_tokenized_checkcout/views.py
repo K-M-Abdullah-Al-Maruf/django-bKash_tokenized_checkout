@@ -498,6 +498,7 @@ def __execute_agreement(response):
         try:
             __query_payment_api_response = (requests.post(__query_agreement_url, headers=__query_agreement_head,json=__query_agreement_body, timeout=__timeout_sec)).json()
         except requests.exceptions.Timeout:
+            print('inside except')
             return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps({'message':'execute agreement api timeout'}))
         
         debugging_print(__query_payment_api_response, 'Query response api =')

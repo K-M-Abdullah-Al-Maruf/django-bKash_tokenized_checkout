@@ -46,7 +46,4 @@ Quick start
 
 2. Include the polls URLconf in your project urls.py like this to create payment for both agreement and non-agreement based checkout url::
 
-    path("``preferred_url/``", django_bKash_tokenized_checkout.views.create_payment), ``for non-agreement based checkout url``
-
-and,
-    path("``preferred_url/``", django_bKash_tokenized_checkout.views.create_agreement), ``to create an agreement``
+    path("django_bKash_tokenized_chekout/",include("django_bKash_tokenized_chekout.urls"))
