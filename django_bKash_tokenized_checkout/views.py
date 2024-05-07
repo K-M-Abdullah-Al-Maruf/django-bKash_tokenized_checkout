@@ -359,7 +359,7 @@ def create_payment(request):
         }
 
         try:
-             __non_tokenized_payment_api_response = (requests.post(__non_tokenized_create_payment_url, headers=__checkout_head,json=__checkout_body, timeout=__timeout_sec)).json()
+            __non_tokenized_payment_api_response = (requests.post(__non_tokenized_create_payment_url, headers=__checkout_head,json=__checkout_body, timeout=__timeout_sec)).json()
         except requests.exceptions.Timeout:
             return HttpResponseRedirect(__base_url+"/?non_tokenized_create_payment_api_data="+json.dumps({'message':'non tokenized payment api timeout'}))
         
@@ -378,7 +378,7 @@ def __execute_payment(response):
     global __payment_id, __execute_payment_url, __query_payment_url, __id_token, __base_url, __timeout_sec, __app_key, __price, __token_approved, __agreement_ID, __agreement_status
 
     __token()
-
+    
     __execute_payment_head = {
     'Accept':'application/json',
     'Authorization': __id_token,
