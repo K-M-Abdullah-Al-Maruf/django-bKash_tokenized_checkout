@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 import requests
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timezone
+from django.urls import resolve, reverse
 
 __start_time = None
 __token_expiration = None
@@ -348,7 +349,7 @@ def create_payment(request):
 
         __checkout_body = {
             'mode':'0011',
-            'payerReference':'01619777283',
+            'payerReference':' ',
             'callbackURL':f'{__base_url}/django_bKash_tokenized_checkout/execute_payment',
             'amount':__price,
             'currency':'BDT',
@@ -424,6 +425,7 @@ def __execute_payment(response):
     __price = None
     
     return HttpResponseRedirect(__base_url+"/?execute_payment_api_data="+json.dumps(__execute_payment_api_response))
+    
 
 
 @csrf_exempt
@@ -442,7 +444,7 @@ def create_agreement(request):
     __create_agreement_body = {
         "mode": "0000",
         "callbackURL": f'{__base_url}/django_bKash_tokenized_checkout/execute_agreement',
-        "payerReference": "01619777283",
+        "payerReference": " ",
     }
 
     try:
