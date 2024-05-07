@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: django_bKash_tokenized_checkout
-Version: 1.5.2
+Version: 1.5.4
 Summary: A Django app to integrate bKash tokenized checkout PGW product.
 Home-page: https://www.example.com/
 Author: K.M. Abdullah-Al-Maruf
