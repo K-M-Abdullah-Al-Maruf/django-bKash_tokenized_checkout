@@ -56,9 +56,7 @@ def get_app_secret_key():
 
 def set_username(user_username):
     global __username
-    print("username is =",__username)
     __username = user_username
-    print("after replacing username is =",__username)
 
 def get_username():
     global __username
@@ -241,7 +239,7 @@ def debugging_print(dict, name):
 
 def __grant_token():
     global __grant_token_url, __start_time, __token_expiration, __grant_token_url, __refresh_token_url,__id_token, __token_expires_in, __refresh_token, __timeout_sec, __app_key, __app_secret, __username, __password, __base_url
-
+    
     __grant_head = {
         'Content-Type':'application/json',
         'Accept':'application/json',
@@ -267,7 +265,6 @@ def __grant_token():
 
 def __generate_refresh_token():
     global __refresh_token_url, __start_time, __token_expiration, __grant_token_url, __refresh_token_url,__id_token, __token_expires_in, __refresh_token, __timeout_sec, __app_key, __app_secret, __username, __password, __base_url
-
 
     __refresh_head = {
         'Content-Type':'application/json',
@@ -468,7 +465,6 @@ def __execute_agreement(response):
    
     __token()
 
-    #Execute agreement api
     __execute_agreement_head = {
     'Accept':'application/json',
     'Authorization': __id_token,
@@ -516,7 +512,8 @@ def __execute_agreement(response):
     debugging_print(__execute_agreement_api_response, 'execute agreement api =')
     
     return HttpResponseRedirect(__base_url+"/?execute_agreement_api_data="+json.dumps(__execute_agreement_api_response))
-    
+
+@csrf_exempt
 def cancel_agreement(request):
     global __cancel_agreement_url, __agreement_ID, __agreement_status, __token_approved
 
