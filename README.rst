@@ -118,36 +118,15 @@ All data will be sent from the backend with the 'API's name' followed by an '='.
 
 13) Here is a list of used API and variable name with which they will send the json data:
 
----------------------------------------------------------------------------------------------------------------------------------
-|                      API                            |     Json response variable name               |  Reason(s)              |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|   Grant token API                                   |  grant_token_api_data                         | If case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|   Refresh token API                                 |  refresh_token_api_data                       | If case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|   Create payment API (agreement based checkout)     |  tokenized_create_payment_api_data            | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|                                                     |                                               | in case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                                            
-|   Create payment API (non-agreement based checkout) |  non_tokenized_create_payment_api_data        | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                              
-|                                                     |                                               | in case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                    
-|   Execute payment API                               |  execute_payment_api_data                     | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|                                                     |                                               | in case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                    
-|   Create Agreement API                              |  create_agreement_api_data                    | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|                                                     |                                               | in case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                    
-|   Execute Agreement API                             |  execute_agreement_api_data                   | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                    
-|                                                     |                                               | in case of any errors   |
-|-----------------------------------------------------|-------------------------------------------------------------------------|                                                                                                       
-|   Cancel Agreement API                              |  cancel_agreement_api_data                    | bKash's API response    |
-|-----------------------------------------------------|-------------------------------------------------------------------------|
-|                                                     |                                               | in case of any errors   |
----------------------------------------------------------------------------------------------------------------------------------                                                                                                   
+
+          API -------> Json response variable name  -------> Reason(s)             
+   i) Grant token API  ------->  grant_token_api_data  ------->  If case of any errors
+  ii) Refresh token API  ------->  refresh_token_api_data   ------->  If case of any errors
+ iii)Create payment API (agreement based checkout)  ------->  tokenized_create_payment_api_data  ------->  bKash's API response and in case of any errors                                                                                                                         
+  iv) Create payment API (non-agreement based checkout) ------->  non_tokenized_create_payment_api_data -------> bKash's API response and in case of any errors                                                                                               
+   v) Execute payment API  ------->  execute_payment_api_data  ------->| bKash's API response and in case of any errors                                                                                                 
+  vi) Create Agreement API   -------> create_agreement_api_data   -------> bKash's API response and in case of any errors                                                                                              
+ vii) Execute Agreement API   ------->  execute_agreement_api_data -------> bKash's API response and in case of any errors                                                                                                       
+viii) Cancel Agreement API   ------->  cancel_agreement_api_data   -------> bKash's API response and in case of any errors                                                                                   
 
 
