@@ -63,6 +63,7 @@ D-jango - bKash_tokenized_checkout
         package_view.set_app_secret_key("")
         package_view.set_username("")
         package_view.set_password("")
+        package_view.set_redirect_url("")
         package_view.set_grant_token_api("")
         package_view.set_refresh_token_api("")
         package_view.set_non_tokenized_create_payment_api("")
@@ -76,6 +77,7 @@ D-jango - bKash_tokenized_checkout
         package_view.set_app_secret_key("")
         package_view.set_username("")
         package_view.set_password("")
+        package_view.set_redirect_url("")
         package_view.set_grant_token_api("")
         package_view.set_refresh_token_api("")
         package_view.set_tokenized_create_payment_api("")
@@ -85,25 +87,27 @@ D-jango - bKash_tokenized_checkout
         package_view.set_execute_agreement_api("")
         package_view.set_cancel_agreement_api("”)
 
-7) Similarly you can also use get methods for all the set methods to retrieve the corresponding data. Similar to the set methods.
+7) Redirect URL will be the URL where all of API responses will be redirected to.
 
-8) Now go to “url.py” and point to the new module name:
+8) Similarly you can also use get methods for all the set methods to retrieve the corresponding data. Similar to the set methods.
+
+9) Now go to “url.py” and point to the new module name:
         
         urlpatterns = [
         .. .. .. .. .. .. .. .. .. ..
         path("django_bKash_tokenized_checkout/",include("django_bKash_tokenized_checkout.urls"))
         ]
 
-9) In order to complete payment, use the following url to redirect and send the amount to pay with the variable named "total_amount” during POST request.
+10) In order to complete payment, use the following url to redirect and send the amount to pay with the variable named "total_amount” during POST request.
         “base_url/path or page if any/ django_bKash_tokenized_checkout/create_payment/”
 
-10) In order to create agreement, use the following url to redirect
+11) In order to create agreement, use the following url to redirect
         “base_url/path or page if any/ django_bKash_tokenized_checkout/create_agreement/”
 
-11) In order to cancel agreement, use the following url to redirect
+12) In order to cancel agreement, use the following url to redirect
         “base_url/path or page if any/ django_bKash_tokenized_checkout/cancel_agreement/”
 
-12) All the APIs will return data in json format. The data are unchanged responses received from bKash's end.
+13) All the APIs will return data in json format. The data are unchanged responses received from bKash's end.
 All data will be sent from the backend with the 'API's name' followed by an '='.
 	
     For example:
@@ -116,13 +120,13 @@ All data will be sent from the backend with the 'API's name' followed by an '='.
 
         Here in the frontend to catch the json u need to use the variable name “execute_agreement_api_data” and get the json and handle it accordingly.
 
-13) Here is a list of used API and variable name with which they will send the json data:
+14) Here is a list of used API and variable name with which they will send the json data:
 
 
           API -------> Json response variable name  -------> Reason(s)             
    i) Grant token API  ------->  grant_token_api_data  ------->  If case of any errors
   ii) Refresh token API  ------->  refresh_token_api_data   ------->  If case of any errors
- iii)Create payment API (agreement based checkout)  ------->  tokenized_create_payment_api_data  ------->  bKash's API response and in case of any errors                                                                                                                         
+ iii) Create payment API (agreement based checkout)  ------->  tokenized_create_payment_api_data  ------->  bKash's API response and in case of any errors                                                                                                                         
   iv) Create payment API (non-agreement based checkout) ------->  non_tokenized_create_payment_api_data -------> bKash's API response and in case of any errors                                                                                               
    v) Execute payment API  ------->  execute_payment_api_data  ------->| bKash's API response and in case of any errors                                                                                                 
   vi) Create Agreement API   -------> create_agreement_api_data   -------> bKash's API response and in case of any errors                                                                                              
