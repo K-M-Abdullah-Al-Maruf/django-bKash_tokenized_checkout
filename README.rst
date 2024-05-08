@@ -87,7 +87,7 @@ D-jango - bKash_tokenized_checkout
         package_view.set_execute_agreement_api("")
         package_view.set_cancel_agreement_api("”)
 
-7) Redirect URL will be the URL where all of API responses will be redirected to.
+7) Redirect URL will be the URL where all of API responses will be redirected to. Need to specify the full URL.
 
 8) Similarly you can also use get methods for all the set methods to retrieve the corresponding data. Similar to the set methods.
 
